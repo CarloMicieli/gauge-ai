@@ -57,3 +57,11 @@ cargo test
 - `specs/001-gauge-ai-tui-app/data-model.md`
 - `specs/001-gauge-ai-tui-app/contracts/command-contract.md`
 - `specs/001-gauge-ai-tui-app/contracts/merge-contract.md`
+
+## 8. Run Notes (2026-04-22)
+- `cargo --version` -> `cargo 1.95.0 (f2d3ce0bd 2026-03-21)`
+- `cargo check` -> pass
+- `cargo run -- /quit` -> pass (`Gauge.ai shutdown completed.`)
+- `cargo fmt` -> pass
+- `cargo clippy -- -D warnings` -> pass
+- `cargo test` -> pass (contract, integration, and unit suites green)

@@ -164,9 +164,9 @@
 - [X] T053 [P] Add focused unit tests for knowledge canonicalization and health transitions in `tests/unit/knowledge_base_tests.rs` and `tests/unit/health_state_tests.rs`
 - [X] T054 [P] Add benchmark harness for cache hashing and knowledge lookup hot paths in `tests/unit/perf_benchmarks.rs`
 - [X] T055 Implement command-to-response and startup timing instrumentation with local perf log output in `src/app/perf.rs` and `src/main.rs`
-- [ ] T056 Refine cross-command error messages and recovery notices in `src/app/commands.rs` and `src/tui/widgets.rs`
-- [ ] T057 Optimize prompt-context filtering and cache reuse in `src/ai/knowledge_base.rs` and `src/ai/normalize.rs`
-- [ ] T058 Run quickstart end-to-end validation and update run notes in `specs/001-gauge-ai-tui-app/quickstart.md`
+- [X] T056 Refine cross-command error messages and recovery notices in `src/app/commands.rs` and `src/tui/widgets.rs`
+- [X] T057 Optimize prompt-context filtering and cache reuse in `src/ai/knowledge_base.rs` and `src/ai/normalize.rs`
+- [X] T058 Run quickstart end-to-end validation and update run notes in `specs/001-gauge-ai-tui-app/quickstart.md`
 
 ---
 

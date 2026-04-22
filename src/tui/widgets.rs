@@ -30,7 +30,10 @@ fn render_event(event: &ScrapeEvent) -> String {
 /// Build human-readable lines for a query result.
 pub fn render_query_result(result: &QueryResultView) -> Vec<String> {
     if let Some(error) = &result.error {
-        return vec![format!("query error: {error}")];
+        return vec![
+            format!("query error: {error}"),
+            "recovery: run /setup, then retry /query with clearer keywords".to_string(),
+        ];
     }
 
     let mut lines = vec![format!(
@@ -53,18 +56,28 @@ pub fn render_latest_result(result: &LatestRun) -> Vec<String> {
         result.summary.failed_scrapers
     )];
     lines.extend(result.messages.iter().cloned());
+    if result.summary.failed_scrapers > 0 {
+        lines.push("recovery: inspect scraper failures and rerun /latest <scraper>".to_string());
+    }
     lines
 }
 
 /// Build human-readable lines for an export result.
 pub fn render_export_result(result: &ExportResultView) -> Vec<String> {
-    vec![
+    let mut lines = vec![
         format!(
             "export: records={}, images={}, missing_images={}",
             result.records, result.images, result.missing_images
         ),
         format!("output: {}", result.output_path),
-    ]
+    ];
+    if result.missing_images > 0 {
+        lines.push(
+            "recovery: review missing-images.txt in the export bundle and rerun /scrape"
+                .to_string(),
+        );
+    }
+    lines
 }
 
 /// Render command help content.
@@ -107,4 +120,17 @@ pub fn render_header_status(
     width: u16,
 ) -> Vec<String> {
     render_header(runtime, health, HeaderMetrics { records, scrapers }, width)
+}
+
+/// Render a generic command failure with a command-specific recovery hint.
+pub fn render_command_failure(command: &str, error: &str) -> Vec<String> {
+    let hint = match command {
+        "/scrape" => "recovery: run /setup and verify manufacturer spelling",
+        "/latest" => "recovery: try /list-scraper and run /latest <scraper>",
+        "/query" => "recovery: run /setup and try broader keywords",
+        "/export" => "recovery: run /query first to confirm matching records",
+        _ => "recovery: run /help for command usage",
+    };
+
+    vec![format!("{command} error: {error}"), hint.to_string()]
 }

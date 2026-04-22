@@ -36,6 +36,21 @@ pub enum CommandError {
     MissingArgs(&'static str),
 }
 
+/// Convert command parser failures into user-readable messages with recovery hints.
+pub fn command_error_message(error: &CommandError) -> String {
+    match error {
+        CommandError::Empty => {
+            "No command entered. Type /help to see available commands.".to_string()
+        }
+        CommandError::Unknown => {
+            "Unknown command. Type /help to see valid slash commands.".to_string()
+        }
+        CommandError::MissingArgs(missing) => {
+            format!("Missing arguments ({missing}). Example: /scrape roco BR 50")
+        }
+    }
+}
+
 /// Dependencies required to execute supported commands.
 pub struct CommandContext<'a> {
     pub registry: &'a ScraperRegistry,
@@ -171,18 +186,19 @@ pub async fn execute(command: Command, context: &CommandContext<'_>) -> AppResul
             let setup = run_setup(context.health, true)?;
             if setup.missing_models.is_empty() {
                 Ok(CommandOutcome::Message(
-                    "setup: Ollama healthy, all required models are already available".to_string(),
+                    "setup: Ollama healthy, all required models are already available; continue with /scrape, /latest, or /query"
+                        .to_string(),
                 ))
             } else {
                 Ok(CommandOutcome::Message(format!(
-                    "setup: missing models [{}]; confirmation accepted; pulled [{}]",
+                    "setup: missing models [{}]; confirmation accepted; pulled [{}]; retry your last AI command",
                     setup.missing_models.join(", "),
                     setup.pulled_models.join(", ")
                 )))
             }
         }
         Command::Quit => Ok(CommandOutcome::Message(
-            "shutdown: graceful quit requested".to_string(),
+            "shutdown: graceful quit requested; background work will be stopped safely".to_string(),
         )),
     };
 
@@ -229,6 +245,8 @@ fn list_scrapers_message(context: &CommandContext<'_>) -> String {
     }
     if lines.len() == 1 {
         lines.push("- none registered".to_string());
+        lines
+            .push("hint: verify scraper modules are enabled, then retry /list-scraper".to_string());
     }
     lines.join("\n")
 }
