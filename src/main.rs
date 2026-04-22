@@ -19,7 +19,8 @@ use gauge_ai::tui::widgets::{render_command_failure, render_header_status, rende
 use ratatui::Terminal;
 use ratatui::backend::CrosstermBackend;
 use ratatui::layout::{Constraint, Direction, Layout};
-use ratatui::widgets::{Block, Borders, Paragraph, Wrap};
+use ratatui::style::{Color, Modifier, Style};
+use ratatui::widgets::{Block, BorderType, Borders, Paragraph, Wrap};
 
 fn main() -> ExitCode {
     init_logging();
@@ -86,10 +87,16 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
         "Gauge.ai TUI started.".to_string(),
         "Type /help for available commands.".to_string(),
     ];
+    let background_style = Style::default().bg(Color::Rgb(0, 0, 0));
+    let primary_style = Style::default()
+        .fg(Color::Rgb(255, 121, 76))
+        .bg(Color::Rgb(0, 0, 0));
+    let subtext_style = Style::default().fg(Color::DarkGray).bg(Color::Rgb(0, 0, 0));
 
     loop {
         terminal.draw(|frame| {
             let area = frame.area();
+            frame.render_widget(Block::default().style(background_style), area);
             let header_lines = render_header_status(&runtime, &runtime.health, 0, 0, area.width);
             let header_height = (header_lines.len() as u16).saturating_add(2);
 
@@ -103,16 +110,40 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
                 .split(area);
 
             let header = Paragraph::new(header_lines.join("\n"))
-                .block(Block::default().title("Gauge.ai").borders(Borders::ALL));
+                .style(primary_style)
+                .block(
+                    Block::default()
+                        .title(" Gauge.ai ")
+                        .title_style(primary_style.add_modifier(Modifier::BOLD))
+                        .borders(Borders::ALL)
+                        .border_type(BorderType::Rounded)
+                        .border_style(primary_style),
+                );
             frame.render_widget(header, chunks[0]);
 
             let output = Paragraph::new(output_lines.join("\n"))
-                .block(Block::default().title("Output").borders(Borders::ALL))
+                .style(subtext_style)
+                .block(
+                    Block::default()
+                        .title(" Console ")
+                        .title_style(primary_style)
+                        .borders(Borders::ALL)
+                        .border_type(BorderType::Rounded)
+                        .border_style(primary_style),
+                )
                 .wrap(Wrap { trim: false });
             frame.render_widget(output, chunks[1]);
 
             let prompt = Paragraph::new(format!("> {input}"))
-                .block(Block::default().title("Command").borders(Borders::ALL));
+                .style(primary_style)
+                .block(
+                    Block::default()
+                        .title(" Command ")
+                        .title_style(primary_style)
+                        .borders(Borders::ALL)
+                        .border_type(BorderType::Rounded)
+                        .border_style(primary_style),
+                );
             frame.render_widget(prompt, chunks[2]);
         })?;
 
