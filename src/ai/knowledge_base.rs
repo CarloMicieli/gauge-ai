@@ -33,6 +33,36 @@ impl Default for KnowledgeBase {
     }
 }
 
+impl KnowledgeBase {
+    /// Return canonical prototype names that match aliases in the query text.
+    pub fn matching_prototypes(&self, text: &str) -> Vec<String> {
+        let lowered = text.to_lowercase();
+        self.prototypes
+            .iter()
+            .filter(|(_, aliases)| {
+                aliases
+                    .iter()
+                    .any(|alias| lowered.contains(&alias.to_lowercase()))
+            })
+            .map(|(canonical, _)| canonical.clone())
+            .collect()
+    }
+
+    /// Return canonical livery names that match aliases in the query text.
+    pub fn matching_liveries(&self, text: &str) -> Vec<String> {
+        let lowered = text.to_lowercase();
+        self.liveries
+            .iter()
+            .filter(|(_, aliases)| {
+                aliases
+                    .iter()
+                    .any(|alias| lowered.contains(&alias.to_lowercase()))
+            })
+            .map(|(canonical, _)| canonical.clone())
+            .collect()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum OllamaHealthState {
     Checking,

@@ -7,4 +7,6 @@ pub mod knowledge_base;
 #[allow(dead_code)]
 pub mod normalize;
 #[allow(dead_code)]
+pub mod query;
+#[allow(dead_code)]
 pub mod queue;

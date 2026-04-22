@@ -6,7 +6,7 @@ use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
 use crate::app::error::AppResult;
 use crate::storage::migrations;
 use crate::storage::models::{
-    ChangeReason, ModelData, ModelVersion, NormalizationStatus, PersistOutcome,
+    ChangeReason, ModelData, ModelVersion, NormalizationStatus, PersistOutcome, QueryRun,
 };
 
 /// Open a SQLite connection pool for the provided database path.
@@ -186,4 +186,22 @@ fn timestamp_now() -> String {
         Ok(duration) => duration.as_secs().to_string(),
         Err(_) => String::from("0"),
     }
+}
+
+/// Persist telemetry for one `/query` execution.
+pub async fn insert_query_run(pool: &SqlitePool, query_run: &QueryRun) -> AppResult<()> {
+    let created_at = timestamp_now();
+
+    sqlx::query(
+        "INSERT INTO query_run (query_text, top_k, latency_ms, result_count, created_at) VALUES (?1, ?2, ?3, ?4, ?5)",
+    )
+    .bind(&query_run.query_text)
+    .bind(query_run.top_k)
+    .bind(query_run.latency_ms)
+    .bind(query_run.result_count)
+    .bind(&created_at)
+    .execute(pool)
+    .await?;
+
+    Ok(())
 }

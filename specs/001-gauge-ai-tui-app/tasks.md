@@ -68,16 +68,16 @@
 
 ### Tests for User Story 2
 
-- [ ] T020 [P] [US2] Create integration test for semantic query happy path in `tests/integration/query_flow.rs`
-- [ ] T021 [P] [US2] Create integration test for disconnected/missing-model fail-fast query behavior in `tests/integration/query_health_guard.rs`
+- [X] T020 [P] [US2] Create integration test for semantic query happy path in `tests/integration/query_flow.rs`
+- [X] T021 [P] [US2] Create integration test for disconnected/missing-model fail-fast query behavior in `tests/integration/query_health_guard.rs`
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] Implement embedding generation and vector retrieval adapter in `src/storage/vector.rs` and `src/ai/client.rs`
-- [ ] T023 [US2] Implement query augmentation and grounded answer generation in `src/ai/query.rs` and `src/app/commands.rs`
-- [ ] T024 [US2] Implement knowledge-base prototype/livery alias query expansion in `src/ai/knowledge_base.rs` and `src/ai/query.rs`
-- [ ] T025 [US2] Persist query telemetry (`QueryRun`) in `src/storage/models.rs` and `src/storage/db.rs`
-- [ ] T026 [US2] Render query results, no-match hints, and error states in `src/tui/widgets.rs` and `src/app/state.rs`
+- [X] T022 [US2] Implement embedding generation and vector retrieval adapter in `src/storage/vector.rs` and `src/ai/client.rs`
+- [X] T023 [US2] Implement query augmentation and grounded answer generation in `src/ai/query.rs` and `src/app/commands.rs`
+- [X] T024 [US2] Implement knowledge-base prototype/livery alias query expansion in `src/ai/knowledge_base.rs` and `src/ai/query.rs`
+- [X] T025 [US2] Persist query telemetry (`QueryRun`) in `src/storage/models.rs` and `src/storage/db.rs`
+- [X] T026 [US2] Render query results, no-match hints, and error states in `src/tui/widgets.rs` and `src/app/state.rs`
 
 **Checkpoint**: US2 works independently on top of local data.
 

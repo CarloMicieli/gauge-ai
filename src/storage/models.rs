@@ -48,3 +48,13 @@ pub enum PersistOutcome {
     Updated,
     Unchanged,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct QueryRun {
+    pub id: Option<i64>,
+    pub query_text: String,
+    pub top_k: i64,
+    pub latency_ms: i64,
+    pub result_count: i64,
+    pub created_at: String,
+}

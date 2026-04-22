@@ -4,3 +4,5 @@ pub mod db;
 pub mod migrations;
 #[allow(dead_code)]
 pub mod models;
+#[allow(dead_code)]
+pub mod vector;

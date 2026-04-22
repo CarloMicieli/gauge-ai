@@ -2,11 +2,14 @@ use std::path::Path;
 
 use sqlx::SqlitePool;
 
+use crate::ai::client::EmbeddingClient;
+use crate::ai::health::{HealthStatus, validate_health_for};
 use crate::ai::knowledge_base::KnowledgeBase;
 use crate::ai::normalize::Normalizer;
+use crate::ai::query::execute_query;
 use crate::app::error::{AppError, AppResult};
 use crate::app::ingest::run_scrape;
-use crate::app::state::ScrapeRun;
+use crate::app::state::{QueryResultView, ScrapeRun};
 use crate::scraper::registry::ScraperRegistry;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -35,12 +38,15 @@ pub struct CommandContext<'a> {
     pub knowledge_base: &'a KnowledgeBase,
     pub pool: &'a SqlitePool,
     pub cache_root: &'a Path,
+    pub health: &'a HealthStatus,
+    pub embedding_client: &'a dyn EmbeddingClient,
 }
 
 /// Result of executing one command.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CommandOutcome {
     Scrape(ScrapeRun),
+    Query(QueryResultView),
     Message(String),
 }
 
@@ -112,6 +118,18 @@ pub async fn execute(command: Command, context: &CommandContext<'_>) -> AppResul
             )
             .await?;
             Ok(CommandOutcome::Scrape(run))
+        }
+        Command::Query { text } => {
+            validate_health_for("/query", context.health)?;
+            let query_result = execute_query(
+                context.pool,
+                context.knowledge_base,
+                context.embedding_client,
+                &text,
+                5,
+            )
+            .await?;
+            Ok(CommandOutcome::Query(query_result))
         }
         other => Err(AppError::Operation(format!(
             "command not implemented yet: {other:?}"

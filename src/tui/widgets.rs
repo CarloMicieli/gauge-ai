@@ -1,5 +1,5 @@
 use crate::app::events::ScrapeEvent;
-use crate::app::state::ScrapeRun;
+use crate::app::state::{QueryResultView, ScrapeRun};
 
 /// Build human-readable progress lines for the current scrape run.
 pub fn render_scrape_progress(run: &ScrapeRun) -> Vec<String> {
@@ -22,4 +22,19 @@ fn render_event(event: &ScrapeEvent) -> String {
         ScrapeEvent::Processed { product_code } => format!("processed {product_code}"),
         ScrapeEvent::Failed { source_url, reason } => format!("failed {source_url}: {reason}"),
     }
+}
+
+/// Build human-readable lines for a query result.
+pub fn render_query_result(result: &QueryResultView) -> Vec<String> {
+    if let Some(error) = &result.error {
+        return vec![format!("query error: {error}")];
+    }
+
+    let mut lines = vec![format!(
+        "query: results={}, latency={}ms",
+        result.result_count, result.latency_ms
+    )];
+    lines.push(result.answer.clone());
+    lines.extend(result.hints.iter().map(|hint| format!("hint: {hint}")));
+    lines
 }
