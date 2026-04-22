@@ -25,6 +25,23 @@ pub struct QueryResultView {
     pub error: Option<String>,
 }
 
+/// Summary counters for latest-sync jobs.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct LatestSummary {
+    pub processed: usize,
+    pub inserted: usize,
+    pub updated: usize,
+    pub skipped_scrapers: usize,
+    pub failed_scrapers: usize,
+}
+
+/// Final state returned from a latest-sync run.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct LatestRun {
+    pub summary: LatestSummary,
+    pub messages: Vec<String>,
+}
+
 impl QueryResultView {
     /// Construct a successful query result.
     pub fn success(answer: String, result_count: usize, latency_ms: i64) -> Self {

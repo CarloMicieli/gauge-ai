@@ -36,6 +36,7 @@ impl Normalizer for PassThroughNormalizer {
             specifications: extracted.specifications.clone(),
             normalization_status: NormalizationStatus::Normalized,
             source_fingerprint: String::new(),
+            last_scraped_at: None,
         })
     }
 }
@@ -62,6 +63,7 @@ pub fn normalize_or_fallback(
             specifications: extracted.specifications.clone(),
             normalization_status: NormalizationStatus::Unnormalized,
             source_fingerprint: String::new(),
+            last_scraped_at: None,
         },
     }
 }

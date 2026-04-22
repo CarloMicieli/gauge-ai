@@ -57,4 +57,9 @@ pub trait ModelScraper: Send + Sync {
     fn supports_latest(&self) -> bool {
         false
     }
+
+    /// Return latest-arrival candidates for this scraper.
+    fn latest_candidates(&self) -> AppResult<Vec<ScrapeCandidate>> {
+        Ok(Vec::new())
+    }
 }

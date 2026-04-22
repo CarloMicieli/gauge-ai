@@ -9,7 +9,8 @@ use crate::ai::normalize::Normalizer;
 use crate::ai::query::execute_query;
 use crate::app::error::{AppError, AppResult};
 use crate::app::ingest::run_scrape;
-use crate::app::state::{QueryResultView, ScrapeRun};
+use crate::app::jobs::run_latest;
+use crate::app::state::{LatestRun, QueryResultView, ScrapeRun};
 use crate::scraper::registry::ScraperRegistry;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -46,6 +47,7 @@ pub struct CommandContext<'a> {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CommandOutcome {
     Scrape(ScrapeRun),
+    Latest(LatestRun),
     Query(QueryResultView),
     Message(String),
 }
@@ -130,6 +132,19 @@ pub async fn execute(command: Command, context: &CommandContext<'_>) -> AppResul
             )
             .await?;
             Ok(CommandOutcome::Query(query_result))
+        }
+        Command::Latest { scraper } => {
+            validate_health_for("/latest", context.health)?;
+            let latest = run_latest(
+                context.registry,
+                scraper.as_deref(),
+                context.normalizer,
+                context.knowledge_base,
+                context.pool,
+                context.cache_root,
+            )
+            .await?;
+            Ok(CommandOutcome::Latest(latest))
         }
         other => Err(AppError::Operation(format!(
             "command not implemented yet: {other:?}"

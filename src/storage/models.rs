@@ -17,6 +17,7 @@ pub struct ModelData {
     pub specifications: BTreeMap<String, String>,
     pub normalization_status: NormalizationStatus,
     pub source_fingerprint: String,
+    pub last_scraped_at: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

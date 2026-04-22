@@ -91,17 +91,17 @@
 
 ### Tests for User Story 3
 
-- [ ] T027 [P] [US3] Create integration test for global `/latest` with skipped-scraper counts in `tests/integration/latest_flow.rs`
-- [ ] T028 [P] [US3] Create integration test for targeted `/latest` unsupported/unknown handling in `tests/integration/latest_targeted_errors.rs`
-- [ ] T029 [P] [US3] Create integration test for `/latest` fail-fast when Ollama is disconnected in `tests/integration/latest_health_guard.rs`
+- [X] T027 [P] [US3] Create integration test for global `/latest` with skipped-scraper counts in `tests/integration/latest_flow.rs`
+- [X] T028 [P] [US3] Create integration test for targeted `/latest` unsupported/unknown handling in `tests/integration/latest_targeted_errors.rs`
+- [X] T029 [P] [US3] Create integration test for `/latest` fail-fast when Ollama is disconnected in `tests/integration/latest_health_guard.rs`
 
 ### Implementation for User Story 3
 
-- [ ] T030 [US3] Implement latest discovery API on scrapers and registry filtering in `src/scraper/traits.rs` and `src/scraper/registry.rs`
-- [ ] T031 [US3] Implement concurrent latest job orchestration in `src/app/jobs.rs` and `src/app/commands.rs`
-- [ ] T032 [US3] Route latest URLs through existing dedupe/merge pipeline in `src/app/ingest.rs` and `src/ai/merge.rs`
-- [ ] T033 [US3] Implement latest completion summaries (inserted/updated/skipped/failed) in `src/app/state.rs` and `src/tui/widgets.rs`
-- [ ] T034 [US3] Update `last_scraped_at` semantics for latest-sync touches in `src/storage/models.rs`
+- [X] T030 [US3] Implement latest discovery API on scrapers and registry filtering in `src/scraper/traits.rs` and `src/scraper/registry.rs`
+- [X] T031 [US3] Implement concurrent latest job orchestration in `src/app/jobs.rs` and `src/app/commands.rs`
+- [X] T032 [US3] Route latest URLs through existing dedupe/merge pipeline in `src/app/ingest.rs` and `src/ai/merge.rs`
+- [X] T033 [US3] Implement latest completion summaries (inserted/updated/skipped/failed) in `src/app/state.rs` and `src/tui/widgets.rs`
+- [X] T034 [US3] Update `last_scraped_at` semantics for latest-sync touches in `src/storage/models.rs`
 
 **Checkpoint**: US3 provides recurring update-feed behavior.
 

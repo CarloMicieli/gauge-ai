@@ -29,7 +29,7 @@ pub async fn initialize(db_path: &Path) -> AppResult<SqlitePool> {
 /// Persist one model, archiving history when the source fingerprint changes.
 pub async fn persist_model(pool: &SqlitePool, model: &ModelData) -> AppResult<PersistOutcome> {
     let existing = sqlx::query(
-        "SELECT manufacturer, product_code, name, description, details, scale, epoch, railway_company, image_urls, local_image_paths, specifications, normalization_status, source_fingerprint FROM model_data WHERE manufacturer = ?1 AND product_code = ?2",
+        "SELECT manufacturer, product_code, name, description, details, scale, epoch, railway_company, image_urls, local_image_paths, specifications, normalization_status, source_fingerprint, last_scraped_at FROM model_data WHERE manufacturer = ?1 AND product_code = ?2",
     )
     .bind(&model.manufacturer)
     .bind(&model.product_code)
@@ -44,6 +44,7 @@ pub async fn persist_model(pool: &SqlitePool, model: &ModelData) -> AppResult<Pe
         NormalizationStatus::Normalized => "Normalized",
         NormalizationStatus::Unnormalized => "Unnormalized",
     };
+    let last_scraped_at = model.last_scraped_at.clone().unwrap_or_else(|| now.clone());
 
     if let Some(row) = existing {
         let existing_fingerprint: String = row.get("source_fingerprint");
@@ -75,6 +76,7 @@ pub async fn persist_model(pool: &SqlitePool, model: &ModelData) -> AppResult<Pe
                     &row.get::<String, _>("normalization_status"),
                 ),
                 source_fingerprint: existing_fingerprint,
+                last_scraped_at: Some(row.get("last_scraped_at")),
             })?,
             change_reason: ChangeReason::ScrapeUpdate,
             merged_by_model: None,
@@ -108,7 +110,7 @@ pub async fn persist_model(pool: &SqlitePool, model: &ModelData) -> AppResult<Pe
         .bind(&specifications_json)
         .bind(normalization_status)
         .bind(&model.source_fingerprint)
-        .bind(&now)
+        .bind(&last_scraped_at)
         .bind(&now)
         .execute(pool)
         .await?;
@@ -132,7 +134,7 @@ pub async fn persist_model(pool: &SqlitePool, model: &ModelData) -> AppResult<Pe
     .bind(&specifications_json)
     .bind(normalization_status)
     .bind(&model.source_fingerprint)
-    .bind(&now)
+    .bind(&last_scraped_at)
     .bind(&now)
     .bind(&now)
     .execute(pool)
@@ -144,7 +146,7 @@ pub async fn persist_model(pool: &SqlitePool, model: &ModelData) -> AppResult<Pe
 /// Load all persisted models for validation and export workflows.
 pub async fn list_models(pool: &SqlitePool) -> AppResult<Vec<ModelData>> {
     let rows = sqlx::query(
-        "SELECT manufacturer, product_code, name, description, details, scale, epoch, railway_company, image_urls, local_image_paths, specifications, normalization_status, source_fingerprint FROM model_data ORDER BY manufacturer, product_code",
+        "SELECT manufacturer, product_code, name, description, details, scale, epoch, railway_company, image_urls, local_image_paths, specifications, normalization_status, source_fingerprint, last_scraped_at FROM model_data ORDER BY manufacturer, product_code",
     )
     .fetch_all(pool)
     .await?;
@@ -169,6 +171,7 @@ fn row_to_model(row: sqlx::sqlite::SqliteRow) -> AppResult<ModelData> {
             &row.get::<String, _>("normalization_status"),
         ),
         source_fingerprint: row.get("source_fingerprint"),
+        last_scraped_at: Some(row.get("last_scraped_at")),
     })
 }
 

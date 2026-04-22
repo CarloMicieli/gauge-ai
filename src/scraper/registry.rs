@@ -38,6 +38,14 @@ impl ScraperRegistry {
             .find(|scraper| scraper.name().eq_ignore_ascii_case(name))
             .map(|scraper| scraper.as_ref())
     }
+
+    /// Return all registered scrapers.
+    pub fn all(&self) -> Vec<&dyn ModelScraper> {
+        self.scrapers
+            .iter()
+            .map(|scraper| scraper.as_ref())
+            .collect()
+    }
 }
 
 impl Default for ScraperRegistry {

@@ -1,5 +1,5 @@
 use crate::app::events::ScrapeEvent;
-use crate::app::state::{QueryResultView, ScrapeRun};
+use crate::app::state::{LatestRun, QueryResultView, ScrapeRun};
 
 /// Build human-readable progress lines for the current scrape run.
 pub fn render_scrape_progress(run: &ScrapeRun) -> Vec<String> {
@@ -36,5 +36,19 @@ pub fn render_query_result(result: &QueryResultView) -> Vec<String> {
     )];
     lines.push(result.answer.clone());
     lines.extend(result.hints.iter().map(|hint| format!("hint: {hint}")));
+    lines
+}
+
+/// Build human-readable lines for a latest-sync result.
+pub fn render_latest_result(result: &LatestRun) -> Vec<String> {
+    let mut lines = vec![format!(
+        "latest: processed={}, inserted={}, updated={}, skipped_scrapers={}, failed_scrapers={}",
+        result.summary.processed,
+        result.summary.inserted,
+        result.summary.updated,
+        result.summary.skipped_scrapers,
+        result.summary.failed_scrapers
+    )];
+    lines.extend(result.messages.iter().cloned());
     lines
 }
