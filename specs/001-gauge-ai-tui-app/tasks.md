@@ -137,21 +137,21 @@
 
 ### Tests for User Story 5
 
-- [ ] T041 [P] [US5] Create contract test for command grammar and aliases in `tests/contract/command_contract.rs`
-- [ ] T042 [P] [US5] Create integration test for logo/header + health indicator states in `tests/integration/header_health_view.rs`
-- [ ] T043 [P] [US5] Create integration test for `/setup` confirmation and pull workflow in `tests/integration/setup_flow.rs`
-- [ ] T044 [P] [US5] Create integration test for `/scrape` fail-fast when Ollama is disconnected in `tests/integration/scrape_health_guard.rs`
+- [X] T041 [P] [US5] Create contract test for command grammar and aliases in `tests/contract/command_contract.rs`
+- [X] T042 [P] [US5] Create integration test for logo/header + health indicator states in `tests/integration/header_health_view.rs`
+- [X] T043 [P] [US5] Create integration test for `/setup` confirmation and pull workflow in `tests/integration/setup_flow.rs`
+- [X] T044 [P] [US5] Create integration test for `/scrape` fail-fast when Ollama is disconnected in `tests/integration/scrape_health_guard.rs`
 
 ### Implementation for User Story 5
 
-- [ ] T045 [US5] Implement `/help` and `/list-scraper` presentation in `src/app/commands.rs` and `src/tui/widgets.rs`
-- [ ] T046 [US5] Implement ASCII logo renderer (full/compact variants) and theme styles in `src/tui/logo.rs` and `src/tui/layout.rs`
-- [ ] T047 [US5] Implement health-state enum updates and periodic checker task in `src/app/state.rs` and `src/ai/health.rs`
-- [ ] T048 [US5] Implement centralized `validate_health_for(command)` guard and apply it to `/scrape`, `/latest`, and `/query` in `src/app/state.rs` and `src/app/commands.rs`
-- [ ] T049 [US5] Render Ollama status indicator and grounded header metrics in `src/tui/widgets.rs` and `src/tui/layout.rs`
-- [ ] T050 [US5] Implement `/setup` diagnostics, missing-model prompts, and pull orchestration in `src/app/commands.rs` and `src/ai/client.rs`
-- [ ] T051 [US5] Implement `/quit` and `/exit` graceful shutdown sequence in `src/app/commands.rs` and `src/main.rs`
-- [ ] T052 [US5] Implement optional wheel animation tick with no input blocking in `src/tui/logo.rs` and `src/app/state.rs`
+- [X] T045 [US5] Implement `/help` and `/list-scraper` presentation in `src/app/commands.rs` and `src/tui/widgets.rs`
+- [X] T046 [US5] Implement ASCII logo renderer (full/compact variants) and theme styles in `src/tui/logo.rs` and `src/tui/layout.rs`
+- [X] T047 [US5] Implement health-state enum updates and periodic checker task in `src/app/state.rs` and `src/ai/health.rs`
+- [X] T048 [US5] Implement centralized `validate_health_for(command)` guard and apply it to `/scrape`, `/latest`, and `/query` in `src/app/state.rs` and `src/app/commands.rs`
+- [X] T049 [US5] Render Ollama status indicator and grounded header metrics in `src/tui/widgets.rs` and `src/tui/layout.rs`
+- [X] T050 [US5] Implement `/setup` diagnostics, missing-model prompts, and pull orchestration in `src/app/commands.rs` and `src/ai/client.rs`
+- [X] T051 [US5] Implement `/quit` and `/exit` graceful shutdown sequence in `src/app/commands.rs` and `src/main.rs`
+- [X] T052 [US5] Implement optional wheel animation tick with no input blocking in `src/tui/logo.rs` and `src/app/state.rs`
 
 **Checkpoint**: All user stories are independently functional and integrated.
 

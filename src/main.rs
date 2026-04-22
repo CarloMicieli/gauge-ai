@@ -6,6 +6,11 @@ use gauge_ai::app::logging::init_logging;
 fn main() -> ExitCode {
     init_logging();
 
+    if is_graceful_quit_requested() {
+        println!("Gauge.ai shutdown completed.");
+        return ExitCode::SUCCESS;
+    }
+
     match run_startup() {
         Ok(()) => ExitCode::SUCCESS,
         Err(err) => {
@@ -13,6 +18,10 @@ fn main() -> ExitCode {
             ExitCode::FAILURE
         }
     }
+}
+
+fn is_graceful_quit_requested() -> bool {
+    matches!(std::env::args().nth(1).as_deref(), Some("/quit" | "/exit"))
 }
 
 fn run_startup() -> gauge_ai::app::error::AppResult<()> {

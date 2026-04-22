@@ -4,11 +4,12 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use sqlx::SqlitePool;
 
 use crate::ai::client::EmbeddingClient;
+use crate::ai::client::run_setup;
 use crate::ai::health::{HealthStatus, validate_health_for};
 use crate::ai::knowledge_base::KnowledgeBase;
 use crate::ai::normalize::Normalizer;
 use crate::ai::query::execute_query;
-use crate::app::error::{AppError, AppResult};
+use crate::app::error::AppResult;
 use crate::app::ingest::run_scrape;
 use crate::app::jobs::run_latest;
 use crate::app::state::{ExportResultView, LatestRun, QueryResultView, ScrapeRun};
@@ -112,6 +113,7 @@ pub async fn execute(command: Command, context: &CommandContext<'_>) -> AppResul
             manufacturer,
             query,
         } => {
+            validate_health_for("/scrape", context.health)?;
             let run = run_scrape(
                 context.registry,
                 &manufacturer,
@@ -149,6 +151,8 @@ pub async fn execute(command: Command, context: &CommandContext<'_>) -> AppResul
             .await?;
             Ok(CommandOutcome::Latest(latest))
         }
+        Command::Help => Ok(CommandOutcome::Message(help_message())),
+        Command::ListScraper => Ok(CommandOutcome::Message(list_scrapers_message(context))),
         Command::Export { query } => {
             let export_dir = build_export_dir(context.cache_root)?;
             let exported = export_records(context.pool, &query, &export_dir).await?;
@@ -159,10 +163,54 @@ pub async fn execute(command: Command, context: &CommandContext<'_>) -> AppResul
                 missing_images: exported.missing_images,
             }))
         }
-        other => Err(AppError::Operation(format!(
-            "command not implemented yet: {other:?}"
-        ))),
+        Command::Setup => {
+            let setup = run_setup(context.health, true)?;
+            if setup.missing_models.is_empty() {
+                Ok(CommandOutcome::Message(
+                    "setup: Ollama healthy, all required models are already available".to_string(),
+                ))
+            } else {
+                Ok(CommandOutcome::Message(format!(
+                    "setup: missing models [{}]; confirmation accepted; pulled [{}]",
+                    setup.missing_models.join(", "),
+                    setup.pulled_models.join(", ")
+                )))
+            }
+        }
+        Command::Quit => Ok(CommandOutcome::Message(
+            "shutdown: graceful quit requested".to_string(),
+        )),
     }
+}
+
+fn help_message() -> String {
+    [
+        "/help",
+        "/list-scraper",
+        "/scrape <manufacturer> <query>",
+        "/latest [scraper_name]",
+        "/query <text>",
+        "/export <query>",
+        "/setup",
+        "/quit (/exit)",
+    ]
+    .join("\n")
+}
+
+fn list_scrapers_message(context: &CommandContext<'_>) -> String {
+    let mut lines = vec!["scrapers:".to_string()];
+    for scraper in context.registry.all() {
+        let latest = if scraper.supports_latest() {
+            "yes"
+        } else {
+            "no"
+        };
+        lines.push(format!("- {} (latest: {latest})", scraper.name()));
+    }
+    if lines.len() == 1 {
+        lines.push("- none registered".to_string());
+    }
+    lines.join("\n")
 }
 
 fn build_export_dir(cache_root: &Path) -> AppResult<PathBuf> {

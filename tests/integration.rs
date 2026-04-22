@@ -2,6 +2,8 @@
 mod export_flow;
 #[path = "integration/export_missing_images.rs"]
 mod export_missing_images;
+#[path = "integration/header_health_view.rs"]
+mod header_health_view;
 #[path = "integration/latest_flow.rs"]
 mod latest_flow;
 #[path = "integration/latest_health_guard.rs"]
@@ -16,3 +18,7 @@ mod query_health_guard;
 mod scrape_cache_hit;
 #[path = "integration/scrape_flow.rs"]
 mod scrape_flow;
+#[path = "integration/scrape_health_guard.rs"]
+mod scrape_health_guard;
+#[path = "integration/setup_flow.rs"]
+mod setup_flow;

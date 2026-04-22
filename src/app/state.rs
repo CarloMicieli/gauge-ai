@@ -1,3 +1,6 @@
+use crate::ai::health::{HealthCheckPolicy, HealthStatus, is_stale, should_run_periodic_check};
+use crate::ai::knowledge_base::OllamaHealthState;
+
 /// Summary counters for a completed scrape job.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ScrapeSummary {
@@ -49,6 +52,82 @@ pub struct ExportResultView {
     pub records: usize,
     pub images: usize,
     pub missing_images: usize,
+}
+
+/// Header view model for current Ollama health state.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HeaderHealthView {
+    pub label: String,
+    pub details: String,
+    pub stale: bool,
+}
+
+/// Runtime state used by periodic health checks and optional logo animation ticks.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RuntimeState {
+    pub health: HealthStatus,
+    pub check_policy: HealthCheckPolicy,
+    pub logo_tick: usize,
+}
+
+impl RuntimeState {
+    /// Build default runtime state from initial health.
+    pub fn new(health: HealthStatus) -> Self {
+        Self {
+            health,
+            check_policy: HealthCheckPolicy::default(),
+            logo_tick: 0,
+        }
+    }
+
+    /// Determine if a periodic health check should execute at this moment.
+    pub fn should_check_health(&self, now_epoch_secs: u64) -> bool {
+        should_run_periodic_check(&self.health, now_epoch_secs, self.check_policy)
+    }
+
+    /// Replace health status from the latest checker probe.
+    pub fn update_health(&mut self, health: HealthStatus) {
+        self.health = health;
+    }
+
+    /// Advance optional logo animation wheel by one frame.
+    pub fn tick_logo(&mut self) {
+        self.logo_tick = self.logo_tick.wrapping_add(1);
+    }
+
+    /// Build a human-friendly header snapshot from current health.
+    pub fn header_health_view(&self, now_epoch_secs: u64) -> HeaderHealthView {
+        let stale = is_stale(
+            &self.health,
+            now_epoch_secs,
+            self.check_policy.stale_after_secs,
+        );
+        let label = match self.health.state {
+            OllamaHealthState::Checking => "checking",
+            OllamaHealthState::Healthy => "healthy",
+            OllamaHealthState::Disconnected => "disconnected",
+            OllamaHealthState::ModelMissing => "model-missing",
+        }
+        .to_string();
+
+        let details = match self.health.state {
+            OllamaHealthState::ModelMissing if !self.health.missing_models.is_empty() => {
+                format!("missing {}", self.health.missing_models.join(", "))
+            }
+            OllamaHealthState::Disconnected => self
+                .health
+                .last_error
+                .clone()
+                .unwrap_or_else(|| "connection unavailable".to_string()),
+            _ => "ready".to_string(),
+        };
+
+        HeaderHealthView {
+            label,
+            details,
+            stale,
+        }
+    }
 }
 
 impl QueryResultView {
