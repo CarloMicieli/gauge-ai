@@ -5,6 +5,7 @@ use std::fmt::{Display, Formatter};
 pub enum AppError {
     Config(String),
     Io(std::io::Error),
+    Operation(String),
 }
 
 impl Display for AppError {
@@ -12,6 +13,7 @@ impl Display for AppError {
         match self {
             Self::Config(msg) => write!(f, "configuration error: {msg}"),
             Self::Io(err) => write!(f, "io error: {err}"),
+            Self::Operation(msg) => write!(f, "operation error: {msg}"),
         }
     }
 }
@@ -39,6 +41,12 @@ impl From<sqlx::Error> for AppError {
 impl From<sqlx::migrate::MigrateError> for AppError {
     fn from(value: sqlx::migrate::MigrateError) -> Self {
         Self::Config(value.to_string())
+    }
+}
+
+impl From<serde_json::Error> for AppError {
+    fn from(value: serde_json::Error) -> Self {
+        Self::Operation(value.to_string())
     }
 }
 

@@ -43,18 +43,18 @@
 
 ### Tests for User Story 1
 
-- [ ] T011 [P] [US1] Create integration test for end-to-end scrape ingestion in `tests/integration/scrape_flow.rs`
-- [ ] T012 [P] [US1] Create integration test for cache hit reuse (no refetch) in `tests/integration/scrape_cache_hit.rs`
+- [X] T011 [P] [US1] Create integration test for end-to-end scrape ingestion in `tests/integration/scrape_flow.rs`
+- [X] T012 [P] [US1] Create integration test for cache hit reuse (no refetch) in `tests/integration/scrape_cache_hit.rs`
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Implement manufacturer discovery/extraction pipeline interfaces in `src/scraper/mod.rs` and `src/scraper/manufacturers/mod.rs`
-- [ ] T014 [US1] Implement caching decorator metadata/image persistence and cache-hit retrieval in `src/scraper/caching_decorator.rs` and `src/cache/filesystem.rs`
-- [ ] T015 [US1] Implement ingestion worker with per-item isolation and progress events in `src/app/state.rs` and `src/app/events.rs`
-- [ ] T016 [US1] Implement normalization with knowledge-base injection and `Unnormalized` fallback path in `src/ai/normalize.rs` and `src/ai/knowledge_base.rs`
-- [ ] T017 [US1] Persist current records and history snapshots for scrape updates in `src/storage/models.rs` and `src/storage/db.rs`
-- [ ] T018 [US1] Wire `/scrape` command execution and throbber/progress UI updates in `src/app/commands.rs` and `src/tui/widgets.rs`
-- [ ] T019 [US1] Implement image download + local path mapping for `local_image_paths` in `src/cache/filesystem.rs` and `src/scraper/caching_decorator.rs`
+- [X] T013 [P] [US1] Implement manufacturer discovery/extraction pipeline interfaces in `src/scraper/mod.rs` and `src/scraper/manufacturers/mod.rs`
+- [X] T014 [US1] Implement caching decorator metadata/image persistence and cache-hit retrieval in `src/scraper/caching_decorator.rs` and `src/cache/filesystem.rs`
+- [X] T015 [US1] Implement ingestion worker with per-item isolation and progress events in `src/app/state.rs` and `src/app/events.rs`
+- [X] T016 [US1] Implement normalization with knowledge-base injection and `Unnormalized` fallback path in `src/ai/normalize.rs` and `src/ai/knowledge_base.rs`
+- [X] T017 [US1] Persist current records and history snapshots for scrape updates in `src/storage/models.rs` and `src/storage/db.rs`
+- [X] T018 [US1] Wire `/scrape` command execution and throbber/progress UI updates in `src/app/commands.rs` and `src/tui/widgets.rs`
+- [X] T019 [US1] Implement image download + local path mapping for `local_image_paths` in `src/cache/filesystem.rs` and `src/scraper/caching_decorator.rs`
 
 **Checkpoint**: US1 delivers a fully working ingest-and-cache MVP.
 

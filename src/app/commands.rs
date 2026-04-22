@@ -1,3 +1,14 @@
+use std::path::Path;
+
+use sqlx::SqlitePool;
+
+use crate::ai::knowledge_base::KnowledgeBase;
+use crate::ai::normalize::Normalizer;
+use crate::app::error::{AppError, AppResult};
+use crate::app::ingest::run_scrape;
+use crate::app::state::ScrapeRun;
+use crate::scraper::registry::ScraperRegistry;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Command {
     Help,
@@ -15,6 +26,22 @@ pub enum CommandError {
     Empty,
     Unknown,
     MissingArgs(&'static str),
+}
+
+/// Dependencies required to execute supported commands.
+pub struct CommandContext<'a> {
+    pub registry: &'a ScraperRegistry,
+    pub normalizer: &'a dyn Normalizer,
+    pub knowledge_base: &'a KnowledgeBase,
+    pub pool: &'a SqlitePool,
+    pub cache_root: &'a Path,
+}
+
+/// Result of executing one command.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CommandOutcome {
+    Scrape(ScrapeRun),
+    Message(String),
 }
 
 /// Parse slash commands into strongly typed app commands.
@@ -64,5 +91,30 @@ pub fn parse(input: &str) -> Result<Command, CommandError> {
         "/setup" => Ok(Command::Setup),
         "/quit" | "/exit" => Ok(Command::Quit),
         _ => Err(CommandError::Unknown),
+    }
+}
+
+/// Execute a parsed command for the currently supported bootstrap flows.
+pub async fn execute(command: Command, context: &CommandContext<'_>) -> AppResult<CommandOutcome> {
+    match command {
+        Command::Scrape {
+            manufacturer,
+            query,
+        } => {
+            let run = run_scrape(
+                context.registry,
+                &manufacturer,
+                &query,
+                context.normalizer,
+                context.knowledge_base,
+                context.pool,
+                context.cache_root,
+            )
+            .await?;
+            Ok(CommandOutcome::Scrape(run))
+        }
+        other => Err(AppError::Operation(format!(
+            "command not implemented yet: {other:?}"
+        ))),
     }
 }

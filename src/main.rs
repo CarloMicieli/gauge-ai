@@ -1,15 +1,7 @@
-mod ai;
-mod app;
-mod cache;
-mod export;
-mod scraper;
-mod storage;
-mod tui;
-
 use std::process::ExitCode;
 
-use app::config::AppConfig;
-use app::logging::init_logging;
+use gauge_ai::app::config::AppConfig;
+use gauge_ai::app::logging::init_logging;
 
 fn main() -> ExitCode {
     init_logging();
@@ -23,7 +15,7 @@ fn main() -> ExitCode {
     }
 }
 
-fn run_startup() -> app::error::AppResult<()> {
+fn run_startup() -> gauge_ai::app::error::AppResult<()> {
     let config = AppConfig::load()?;
 
     std::fs::create_dir_all(&config.data_dir)?;
