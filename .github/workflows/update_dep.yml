@@ -1,0 +1,44 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    # Run weekly on Tuesdays at 00:00 UTC
+    - cron: '0 0 * * 2'
+  workflow_dispatch:
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+    - name: 📂 Checkout
+      uses: actions/checkout@v5
+
+    - name: 🦀 Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: 🦀 Install cargo-edit
+      uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-edit
+
+    - name: 🦀 Upgrade dependencies
+      run: cargo upgrade --pinned # Updates Cargo.toml
+
+    - name: 🦀 Update Cargo.lock
+      run: cargo update # Ensures lockfile matches new TOML
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'chore: weekly cargo update'
+        title: 'chore: weekly cargo update'
+        body: |
+          Automated weekly dependency updates.
+          - Updated `Cargo.lock`
+        branch: automated-dep-update
+        delete-branch: true
