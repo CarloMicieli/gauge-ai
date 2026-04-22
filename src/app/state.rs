@@ -42,6 +42,15 @@ pub struct LatestRun {
     pub messages: Vec<String>,
 }
 
+/// Export result view model for command output rendering.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ExportResultView {
+    pub output_path: String,
+    pub records: usize,
+    pub images: usize,
+    pub missing_images: usize,
+}
+
 impl QueryResultView {
     /// Construct a successful query result.
     pub fn success(answer: String, result_count: usize, latency_ms: i64) -> Self {

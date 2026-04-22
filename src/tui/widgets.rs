@@ -1,5 +1,5 @@
 use crate::app::events::ScrapeEvent;
-use crate::app::state::{LatestRun, QueryResultView, ScrapeRun};
+use crate::app::state::{ExportResultView, LatestRun, QueryResultView, ScrapeRun};
 
 /// Build human-readable progress lines for the current scrape run.
 pub fn render_scrape_progress(run: &ScrapeRun) -> Vec<String> {
@@ -51,4 +51,15 @@ pub fn render_latest_result(result: &LatestRun) -> Vec<String> {
     )];
     lines.extend(result.messages.iter().cloned());
     lines
+}
+
+/// Build human-readable lines for an export result.
+pub fn render_export_result(result: &ExportResultView) -> Vec<String> {
+    vec![
+        format!(
+            "export: records={}, images={}, missing_images={}",
+            result.records, result.images, result.missing_images
+        ),
+        format!("output: {}", result.output_path),
+    ]
 }

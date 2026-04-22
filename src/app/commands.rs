@@ -1,4 +1,5 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use sqlx::SqlitePool;
 
@@ -10,7 +11,8 @@ use crate::ai::query::execute_query;
 use crate::app::error::{AppError, AppResult};
 use crate::app::ingest::run_scrape;
 use crate::app::jobs::run_latest;
-use crate::app::state::{LatestRun, QueryResultView, ScrapeRun};
+use crate::app::state::{ExportResultView, LatestRun, QueryResultView, ScrapeRun};
+use crate::export::export_records;
 use crate::scraper::registry::ScraperRegistry;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -49,6 +51,7 @@ pub enum CommandOutcome {
     Scrape(ScrapeRun),
     Latest(LatestRun),
     Query(QueryResultView),
+    Export(ExportResultView),
     Message(String),
 }
 
@@ -146,8 +149,32 @@ pub async fn execute(command: Command, context: &CommandContext<'_>) -> AppResul
             .await?;
             Ok(CommandOutcome::Latest(latest))
         }
+        Command::Export { query } => {
+            let export_dir = build_export_dir(context.cache_root)?;
+            let exported = export_records(context.pool, &query, &export_dir).await?;
+            Ok(CommandOutcome::Export(ExportResultView {
+                output_path: exported.output_path,
+                records: exported.records,
+                images: exported.images,
+                missing_images: exported.missing_images,
+            }))
+        }
         other => Err(AppError::Operation(format!(
             "command not implemented yet: {other:?}"
         ))),
     }
+}
+
+fn build_export_dir(cache_root: &Path) -> AppResult<PathBuf> {
+    let base = cache_root
+        .parent()
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|| cache_root.to_path_buf());
+    let epoch_secs = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|duration| duration.as_secs())
+        .unwrap_or(0);
+    let export_dir = base.join("exports").join(format!("export-{epoch_secs}"));
+    std::fs::create_dir_all(&export_dir)?;
+    Ok(export_dir)
 }

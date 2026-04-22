@@ -115,15 +115,15 @@
 
 ### Tests for User Story 4
 
-- [ ] T035 [P] [US4] Create integration test for JSON/CSV + image export bundle in `tests/integration/export_flow.rs`
-- [ ] T036 [P] [US4] Create integration test for missing-image manifest handling in `tests/integration/export_missing_images.rs`
+- [X] T035 [P] [US4] Create integration test for JSON/CSV + image export bundle in `tests/integration/export_flow.rs`
+- [X] T036 [P] [US4] Create integration test for missing-image manifest handling in `tests/integration/export_missing_images.rs`
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] Implement export selection/query projection in `src/export/mod.rs` and `src/storage/models.rs`
-- [ ] T038 [US4] Implement JSON and CSV serializers in `src/export/json.rs` and `src/export/csv.rs`
-- [ ] T039 [US4] Implement zip/directory bundling and manifest generation in `src/export/archive.rs`
-- [ ] T040 [US4] Wire `/export` command responses and output path messaging in `src/app/commands.rs` and `src/tui/widgets.rs`
+- [X] T037 [US4] Implement export selection/query projection in `src/export/mod.rs` and `src/storage/models.rs`
+- [X] T038 [US4] Implement JSON and CSV serializers in `src/export/json.rs` and `src/export/csv.rs`
+- [X] T039 [US4] Implement zip/directory bundling and manifest generation in `src/export/archive.rs`
+- [X] T040 [US4] Wire `/export` command responses and output path messaging in `src/app/commands.rs` and `src/tui/widgets.rs`
 
 **Checkpoint**: US4 can be demonstrated and used independently.
 

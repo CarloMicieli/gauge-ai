@@ -1,3 +1,7 @@
+#[path = "integration/export_flow.rs"]
+mod export_flow;
+#[path = "integration/export_missing_images.rs"]
+mod export_missing_images;
 #[path = "integration/latest_flow.rs"]
 mod latest_flow;
 #[path = "integration/latest_health_guard.rs"]
