@@ -12,6 +12,7 @@ use crate::ai::query::execute_query;
 use crate::app::error::AppResult;
 use crate::app::ingest::run_scrape;
 use crate::app::jobs::run_latest;
+use crate::app::perf::log_command_timing;
 use crate::app::state::{ExportResultView, LatestRun, QueryResultView, ScrapeRun};
 use crate::export::export_records;
 use crate::scraper::registry::ScraperRegistry;
@@ -108,7 +109,10 @@ pub fn parse(input: &str) -> Result<Command, CommandError> {
 
 /// Execute a parsed command for the currently supported bootstrap flows.
 pub async fn execute(command: Command, context: &CommandContext<'_>) -> AppResult<CommandOutcome> {
-    match command {
+    let command_name = command_name(&command);
+    let started_at = std::time::Instant::now();
+
+    let result = match command {
         Command::Scrape {
             manufacturer,
             query,
@@ -180,6 +184,22 @@ pub async fn execute(command: Command, context: &CommandContext<'_>) -> AppResul
         Command::Quit => Ok(CommandOutcome::Message(
             "shutdown: graceful quit requested".to_string(),
         )),
+    };
+
+    let _ = log_command_timing(command_name, started_at);
+    result
+}
+
+fn command_name(command: &Command) -> &'static str {
+    match command {
+        Command::Help => "/help",
+        Command::ListScraper => "/list-scraper",
+        Command::Scrape { .. } => "/scrape",
+        Command::Latest { .. } => "/latest",
+        Command::Query { .. } => "/query",
+        Command::Export { .. } => "/export",
+        Command::Setup => "/setup",
+        Command::Quit => "/quit",
     }
 }
 

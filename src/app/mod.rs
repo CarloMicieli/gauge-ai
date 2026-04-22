@@ -9,5 +9,6 @@ pub mod ingest;
 #[allow(dead_code)]
 pub mod jobs;
 pub mod logging;
+pub mod perf;
 #[allow(dead_code)]
 pub mod state;
