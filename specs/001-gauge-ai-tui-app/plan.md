@@ -27,6 +27,15 @@ Ollama Health Plan:
 - Render a small status indicator in the header area tied to current health state.
 - Route missing-model remediation through `/setup` with explicit confirmation before pull actions.
 - Enforce fast-fail user messaging for AI-dependent commands when health is not ready.
+- Health-check timing policy: hybrid guard strategy
+    - 30-second background heartbeat updates shared UI status.
+    - Preflight check on AI-dependent command entry (`/scrape`, `/latest`, `/query`) when the last health check is stale or unhealthy.
+    - This avoids command-latency overhead on every keystroke while preventing stale-health false positives.
+
+Performance Validation Plan:
+- Add command-to-response latency instrumentation for AI-dependent commands and persist profile logs under local app data.
+- Add startup timing instrumentation from process start to first interactive frame.
+- Add benchmark tasks for cache hash and knowledge-base lookup hot paths (using current project toolchain; avoid dependency additions unless explicitly approved).
 
 UI Branding Plan:
 - Render a Gauge.ai ASCII locomotive header in the main/home pane using `ratatui::text::Line` + styled spans.
@@ -163,6 +172,7 @@ src/
     └── archive.rs
 
 tests/
+├── unit/
 ├── integration/
 │   ├── scrape_flow.rs
 │   ├── latest_flow.rs

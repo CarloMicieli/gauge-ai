@@ -31,7 +31,7 @@
 - Alternatives considered: Fully parallel Ollama calls. Rejected for reliability and host resource limits.
 
 ## Decision 7: Use TUI command contract as the primary external interface
-- Decision: Define command-level contracts for `/help`, `/list-scraper`, `/scrape`, `/latest`, `/query`, `/export` plus standardized summary/error outputs.
+- Decision: Define command-level contracts for `/help`, `/list-scraper`, `/scrape`, `/latest`, `/query`, `/export`, `/setup`, and `/quit` (with `/exit` alias) plus standardized summary/error outputs.
 - Rationale: The application is TUI-first; command semantics are the user-facing contract that downstream tests must validate.
 - Alternatives considered: HTTP API as the primary contract. Rejected because no web-service interface is in scope.
 
