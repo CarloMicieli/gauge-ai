@@ -1,0 +1,22 @@
+[package]
+name = "gauge-ai"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+config = "0.15.22"
+crossterm = "0.29.0"
+digest = "0.11.2"
+directories = "6.0.0"
+ollama-rs = "0.3.4"
+ratatui = "0.30.0"
+ratatui-image = "10.0.6"
+reqwest = "0.13.2"
+scraper = "0.26.0"
+serde = "1.0.228"
+sha2 = "0.11.0"
+sqlx = "0.8.6"
+throbber-widgets-tui = "0.11.0"
+tokio = "1.52.1"
+tui-input = "0.15.3"
+zip = "8.5.1"

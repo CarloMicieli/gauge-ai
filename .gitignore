@@ -1,0 +1,33 @@
+# --- Rust / Cargo ---
+# The /target directory contains all compiled artifacts (can be several GBs)
+/target
+
+# --- IDEs / Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# --- Databases & Local Storage ---
+# Ignore the actual SQLite database files (Gauge.ai's local knowledge base)
+*.db
+*.db-journal
+*.db-wal
+
+# --- Assets & Cache ---
+# Ignore the local scraper cache and images to prevent committing binaries
+/cache/
+/exports/
+*.log
+
+# --- Environment & Secrets ---
+# If you ever add an API key for a non-local service
+.env
+.env.local
+
+# --- Cargo Lock ---
+# For executable binary projects (like a TUI), it is recommended to 
+# commit Cargo.lock to ensure reproducible builds. 
+# However, if this were a library, you would ignore it.
+# Cargo.lock
