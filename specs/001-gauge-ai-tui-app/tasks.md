@@ -11,10 +11,10 @@
 
 **Purpose**: Create the base module layout and configuration scaffolding used by all stories.
 
-- [ ] T001 Create module skeleton and `mod.rs` wiring in `src/app/mod.rs`, `src/tui/mod.rs`, `src/scraper/mod.rs`, `src/ai/mod.rs`, `src/storage/mod.rs`, `src/cache/mod.rs`, and `src/export/mod.rs`
-- [ ] T002 Configure crate features and build settings for async SQLite and terminal stack in `Cargo.toml`
-- [ ] T003 [P] Implement configuration loader and default paths in `src/app/config.rs` and initialize startup config flow in `src/main.rs`
-- [ ] T004 [P] Add shared error/result types and app logging surface in `src/app/error.rs` and `src/app/logging.rs`
+- [X] T001 Create module skeleton and `mod.rs` wiring in `src/app/mod.rs`, `src/tui/mod.rs`, `src/scraper/mod.rs`, `src/ai/mod.rs`, `src/storage/mod.rs`, `src/cache/mod.rs`, and `src/export/mod.rs`
+- [X] T002 Configure crate features and build settings for async SQLite and terminal stack in `Cargo.toml`
+- [X] T003 [P] Implement configuration loader and default paths in `src/app/config.rs` and initialize startup config flow in `src/main.rs`
+- [X] T004 [P] Add shared error/result types and app logging surface in `src/app/error.rs` and `src/app/logging.rs`
 
 ---
 
@@ -24,12 +24,12 @@
 
 **CRITICAL**: No user story work starts until this phase is done.
 
-- [ ] T005 Implement database bootstrap and migration runner in `src/storage/migrations.rs`, `src/storage/db.rs`, and `migrations/0001_init.sql`
-- [ ] T006 [P] Define core domain structs/enums (`ModelData`, `ModelVersion`, `KnowledgeBase`, `OllamaHealthState`) in `src/storage/models.rs` and `src/ai/knowledge_base.rs`
-- [ ] T007 [P] Implement slash-command parser and dispatch shell for `/help`, `/list-scraper`, `/scrape`, `/latest`, `/query`, `/export`, `/setup`, `/quit` in `src/app/commands.rs`
-- [ ] T008 [P] Implement Ollama client wrapper, health-check scheduler, and serialized worker queue scaffolding in `src/ai/client.rs`, `src/ai/health.rs`, and `src/ai/queue.rs`
-- [ ] T009 [P] Implement scraper trait/registry contracts with optional latest capability in `src/scraper/traits.rs` and `src/scraper/registry.rs`
-- [ ] T010 Implement cache path/hash helpers and content-addressable layout utilities in `src/cache/filesystem.rs`
+- [X] T005 Implement database bootstrap and migration runner in `src/storage/migrations.rs`, `src/storage/db.rs`, and `migrations/0001_init.sql`
+- [X] T006 [P] Define core domain structs/enums (`ModelData`, `ModelVersion`, `KnowledgeBase`, `OllamaHealthState`) in `src/storage/models.rs` and `src/ai/knowledge_base.rs`
+- [X] T007 [P] Implement slash-command parser and dispatch shell for `/help`, `/list-scraper`, `/scrape`, `/latest`, `/query`, `/export`, `/setup`, `/quit` in `src/app/commands.rs`
+- [X] T008 [P] Implement Ollama client wrapper, health-check scheduler, and serialized worker queue scaffolding in `src/ai/client.rs`, `src/ai/health.rs`, and `src/ai/queue.rs`
+- [X] T009 [P] Implement scraper trait/registry contracts with optional latest capability in `src/scraper/traits.rs` and `src/scraper/registry.rs`
+- [X] T010 Implement cache path/hash helpers and content-addressable layout utilities in `src/cache/filesystem.rs`
 
 **Checkpoint**: Foundation complete; stories can proceed independently.
 

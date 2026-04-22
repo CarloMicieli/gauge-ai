@@ -31,3 +31,15 @@
 # commit Cargo.lock to ensure reproducible builds. 
 # However, if this were a library, you would ignore it.
 # Cargo.lock
+
+# --- Additional Rust build outputs ---
+debug/
+release/
+*.rs.bk
+*.rlib
+*.prof*
+
+# --- Additional universal ignores ---
+Thumbs.db
+*.tmp
+.env*
