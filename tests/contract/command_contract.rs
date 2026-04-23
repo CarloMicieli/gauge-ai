@@ -30,6 +30,7 @@ fn parses_command_grammar_and_aliases() {
         })
     );
     assert_eq!(parse("/setup"), Ok(Command::Setup));
+    assert_eq!(parse("/clear"), Ok(Command::Clear));
     assert_eq!(parse("/quit"), Ok(Command::Quit));
     assert_eq!(parse("/exit"), Ok(Command::Quit));
 }

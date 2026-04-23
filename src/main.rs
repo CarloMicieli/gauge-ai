@@ -169,6 +169,7 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
                             output_lines.push(format!("> {submitted}"));
                             match parse(&submitted) {
                                 Ok(Command::Help) => output_lines.extend(render_help()),
+                                Ok(Command::Clear) => output_lines.clear(),
                                 Ok(Command::Quit) => break,
                                 Ok(command) => {
                                     let command_name = command_label(&command);
@@ -211,6 +212,7 @@ fn command_label(command: &Command) -> &'static str {
         Command::Query { .. } => "/query",
         Command::Export { .. } => "/export",
         Command::Setup => "/setup",
+        Command::Clear => "/clear",
         Command::Quit => "/quit",
     }
 }

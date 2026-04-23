@@ -90,6 +90,7 @@ pub fn render_help() -> Vec<String> {
         "/query <text>".to_string(),
         "/export <query>".to_string(),
         "/setup".to_string(),
+        "/clear".to_string(),
         "/quit (/exit)".to_string(),
     ]
 }

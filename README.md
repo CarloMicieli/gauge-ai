@@ -102,6 +102,7 @@ When a duplicate SKU is found across different sources (e.g., Roco.cc vs. an E-s
 | `/latest` | `/latest [mfr]` | Scans "New Arrivals" on supported sites. |
 | `/query` | `/query <text>` | Semantic search via embeddings + vector database. |
 | `/export` | `/export <query>` | Bundles JSON and image assets for matching records. |
+| `/clear` | `/clear` | Clears in-memory chat history from the TUI console. |
 
 ### 6.1 Feedback Systems
 * **Async Loader:** A throbber widget that alternates between bold and normal text with a "..." cycle to indicate background Ollama/Scrape activity.

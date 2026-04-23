@@ -26,6 +26,7 @@ pub enum Command {
     Query { text: String },
     Export { query: String },
     Setup,
+    Clear,
     Quit,
 }
 
@@ -117,6 +118,7 @@ pub fn parse(input: &str) -> Result<Command, CommandError> {
             Ok(Command::Export { query })
         }
         "/setup" => Ok(Command::Setup),
+        "/clear" => Ok(Command::Clear),
         "/quit" | "/exit" => Ok(Command::Quit),
         _ => Err(CommandError::Unknown),
     }
@@ -197,6 +199,9 @@ pub async fn execute(command: Command, context: &CommandContext<'_>) -> AppResul
                 )))
             }
         }
+        Command::Clear => Ok(CommandOutcome::Message(
+            "clear: chat history buffer reset".to_string(),
+        )),
         Command::Quit => Ok(CommandOutcome::Message(
             "shutdown: graceful quit requested; background work will be stopped safely".to_string(),
         )),
@@ -215,6 +220,7 @@ fn command_name(command: &Command) -> &'static str {
         Command::Query { .. } => "/query",
         Command::Export { .. } => "/export",
         Command::Setup => "/setup",
+        Command::Clear => "/clear",
         Command::Quit => "/quit",
     }
 }
@@ -228,6 +234,7 @@ fn help_message() -> String {
         "/query <text>",
         "/export <query>",
         "/setup",
+        "/clear",
         "/quit (/exit)",
     ]
     .join("\n")

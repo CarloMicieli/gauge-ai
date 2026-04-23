@@ -13,6 +13,7 @@ Defines command syntax, argument rules, and expected response semantics for the 
 /query <text>
 /export <query>
 /setup
+/clear
 /quit
 /exit
 ```
@@ -82,6 +83,12 @@ Defines command syntax, argument rules, and expected response semantics for the 
 - Errors:
   - `OLLAMA_DISCONNECTED`
   - `SETUP_PULL_FAILED`
+
+### /clear
+- Input: none
+- Output:
+  - clears in-memory TUI console history for the current session.
+- Errors: none (always succeeds when UI is active).
 
 ### /quit and /exit
 - Input: none
