@@ -239,6 +239,19 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
                     .border_style(primary_style),
             );
             frame.render_widget(prompt, chunks[2]);
+
+            let prompt_inner = Block::default()
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded)
+                .inner(chunks[2]);
+            let cursor_x = prompt_inner
+                .x
+                .saturating_add(2)
+                .saturating_add(input.visual_cursor() as u16);
+            let cursor_max_x = prompt_inner
+                .x
+                .saturating_add(prompt_inner.width.saturating_sub(1));
+            frame.set_cursor_position((cursor_x.min(cursor_max_x), prompt_inner.y));
         })?;
 
         if event::poll(std::time::Duration::from_millis(120))? {
@@ -333,7 +346,15 @@ fn current_epoch_secs() -> u64 {
 
 fn refresh_autocomplete(input: &Input) -> (Option<&'static str>, String) {
     let typed = input.value();
-    let top_suggestion = top_command_suggestion(typed);
+
+    // Keep autocomplete unobtrusive: suggest only while typing a single command token
+    // at the end of the input, not while editing mid-line or command arguments.
+    let cursor_at_end = input.cursor() == typed.chars().count();
+    if !cursor_at_end || typed.contains(char::is_whitespace) {
+        return (None, String::new());
+    }
+
+    let top_suggestion = top_command_suggestion(typed).filter(|suggestion| *suggestion != typed);
     let typed_before_cursor = input_prefix_for_cursor(typed, input.cursor());
     let ghost_suffix = top_suggestion
         .and_then(|suggestion| suggestion.strip_prefix(typed_before_cursor))
