@@ -14,7 +14,8 @@ fn header_renders_health_indicator_states() {
 
     let mut runtime = RuntimeState::new(base.clone());
     let checking = render_header_status(&runtime, &base, 12, 2, 120).join("\n");
-    assert!(checking.contains("status: checking"));
+    assert!(checking.contains("✦ checking"));
+    assert!(!checking.contains("Welcome back."));
 
     runtime.update_health(HealthStatus {
         state: OllamaHealthState::Healthy,
@@ -24,7 +25,7 @@ fn header_renders_health_indicator_states() {
     });
     runtime.tick_logo();
     let healthy = render_header_status(&runtime, &runtime.health, 20, 2, 120).join("\n");
-    assert!(healthy.contains("status: healthy"));
+    assert!(healthy.contains("✦ healthy"));
 
     runtime.update_health(HealthStatus {
         state: OllamaHealthState::Disconnected,
@@ -33,8 +34,8 @@ fn header_renders_health_indicator_states() {
         last_checked_epoch_secs: 12,
     });
     let disconnected = render_header_status(&runtime, &runtime.health, 20, 2, 50).join("\n");
-    assert!(disconnected.contains("status: disconnected"));
-    assert!(disconnected.contains("Gauge.ai"));
+    assert!(disconnected.contains("✦ disconnected"));
+    assert!(disconnected.contains("GAUGE.AI"));
 
     runtime.update_health(HealthStatus {
         state: OllamaHealthState::ModelMissing,
@@ -43,6 +44,7 @@ fn header_renders_health_indicator_states() {
         last_checked_epoch_secs: 13,
     });
     let model_missing = render_header_status(&runtime, &runtime.health, 20, 2, 120).join("\n");
-    assert!(model_missing.contains("status: model-missing"));
+    assert!(model_missing.contains("✦ model-missing"));
     assert!(model_missing.contains("missing llama3.1:8b"));
+    assert!(model_missing.contains("▦ grounded: records=20, scrapers=2"));
 }

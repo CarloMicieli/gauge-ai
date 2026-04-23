@@ -2,7 +2,7 @@ use crate::ai::health::HealthStatus;
 use crate::app::events::ScrapeEvent;
 use crate::app::state::{ExportResultView, LatestRun, QueryResultView, RuntimeState, ScrapeRun};
 use crate::scraper::registry::ScraperRegistry;
-use crate::tui::layout::{HeaderMetrics, render_header};
+use crate::tui::layout::{HeaderMetrics, HeaderSections, render_header, render_header_sections};
 
 /// Build human-readable progress lines for the current scrape run.
 pub fn render_scrape_progress(run: &ScrapeRun) -> Vec<String> {
@@ -121,6 +121,17 @@ pub fn render_header_status(
     width: u16,
 ) -> Vec<String> {
     render_header(runtime, health, HeaderMetrics { records, scrapers }, width)
+}
+
+/// Render split-header content for the top-level nested layout.
+pub fn render_split_header(
+    runtime: &RuntimeState,
+    health: &HealthStatus,
+    records: usize,
+    scrapers: usize,
+    width: u16,
+) -> HeaderSections {
+    render_header_sections(runtime, health, HeaderMetrics { records, scrapers }, width)
 }
 
 /// Render a generic command failure with a command-specific recovery hint.
