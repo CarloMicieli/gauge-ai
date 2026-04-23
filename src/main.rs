@@ -9,7 +9,7 @@ use crossterm::terminal::{
 };
 use gauge_ai::ai::health::HealthStatus;
 use gauge_ai::ai::knowledge_base::OllamaHealthState;
-use gauge_ai::app::commands::{Command, command_error_message, parse};
+use gauge_ai::app::commands::{Command, command_error_message, parse, top_command_suggestion};
 use gauge_ai::app::config::AppConfig;
 use gauge_ai::app::error::AppResult;
 use gauge_ai::app::logging::init_logging;
@@ -24,6 +24,8 @@ use ratatui::layout::{Constraint, Direction, Layout};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::{Block, BorderType, Borders, Paragraph, Wrap};
+use tui_input::Input;
+use tui_input::backend::crossterm::EventHandler as TuiInputEventHandler;
 
 fn main() -> ExitCode {
     init_logging();
@@ -85,7 +87,8 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
         last_checked_epoch_secs: now,
     };
     let mut runtime = RuntimeState::new(health);
-    let mut input = String::new();
+    let mut input = Input::default();
+    let (mut top_suggestion, mut ghost_suffix) = refresh_autocomplete(&input);
     let mut output_lines = vec![
         "Gauge.ai TUI started.".to_string(),
         "Type /help for available commands.".to_string(),
@@ -107,6 +110,7 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
     let grounded_icon_style = Style::default()
         .fg(Color::Rgb(255, 214, 10))
         .bg(Color::Rgb(0, 0, 0));
+    let ghost_style = primary_style.add_modifier(Modifier::DIM);
 
     loop {
         terminal.draw(|frame| {
@@ -215,34 +219,42 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
                 .wrap(Wrap { trim: false });
             frame.render_widget(output, chunks[1]);
 
-            let prompt = Paragraph::new(format!("> {input}"))
-                .style(primary_style)
-                .block(
-                    Block::default()
-                        .title(" Command ")
-                        .title_style(primary_style)
-                        .borders(Borders::ALL)
-                        .border_type(BorderType::Rounded)
-                        .border_style(primary_style),
-                );
+            let typed = input.value();
+            let typed_before_cursor = input_prefix_for_cursor(typed, input.cursor());
+            let typed_after_cursor = &typed[typed_before_cursor.len()..];
+
+            let mut prompt_line = vec![Span::styled("> ", primary_style)];
+            prompt_line.push(Span::styled(typed_before_cursor.to_string(), primary_style));
+            if !ghost_suffix.is_empty() {
+                prompt_line.push(Span::styled(ghost_suffix.clone(), ghost_style));
+            }
+            prompt_line.push(Span::styled(typed_after_cursor.to_string(), primary_style));
+
+            let prompt = Paragraph::new(Line::from(prompt_line)).block(
+                Block::default()
+                    .title(" Command ")
+                    .title_style(primary_style)
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded)
+                    .border_style(primary_style),
+            );
             frame.render_widget(prompt, chunks[2]);
         })?;
 
         if event::poll(std::time::Duration::from_millis(120))? {
             let event = event::read()?;
-            if let Event::Key(key) = event {
+            if let Event::Key(key) = &event {
                 if key.kind != KeyEventKind::Press {
                     continue;
                 }
 
                 match key.code {
-                    KeyCode::Char(c) => input.push(c),
-                    KeyCode::Backspace => {
-                        input.pop();
-                    }
                     KeyCode::Enter => {
-                        let submitted = input.trim().to_string();
-                        input.clear();
+                        let submitted = input.value_and_reset();
+                        let submitted = submitted.trim().to_string();
+
+                        top_suggestion = None;
+                        ghost_suffix.clear();
 
                         if submitted.is_empty() {
                             output_lines.push("hint: enter a slash command like /help".to_string());
@@ -265,7 +277,21 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
 
                         trim_output_lines(&mut output_lines, 120);
                     }
-                    _ => {}
+                    KeyCode::Tab => {
+                        if let Some(suggestion) = top_suggestion {
+                            input = Input::new(suggestion.to_string());
+                            let refreshed = refresh_autocomplete(&input);
+                            top_suggestion = refreshed.0;
+                            ghost_suffix = refreshed.1;
+                        }
+                    }
+                    _ => {
+                        if input.handle_event(&event).is_some() {
+                            let refreshed = refresh_autocomplete(&input);
+                            top_suggestion = refreshed.0;
+                            ghost_suffix = refreshed.1;
+                        }
+                    }
                 }
             }
         }
@@ -303,4 +329,25 @@ fn current_epoch_secs() -> u64 {
         .duration_since(std::time::UNIX_EPOCH)
         .map(|duration| duration.as_secs())
         .unwrap_or(0)
+}
+
+fn refresh_autocomplete(input: &Input) -> (Option<&'static str>, String) {
+    let typed = input.value();
+    let top_suggestion = top_command_suggestion(typed);
+    let typed_before_cursor = input_prefix_for_cursor(typed, input.cursor());
+    let ghost_suffix = top_suggestion
+        .and_then(|suggestion| suggestion.strip_prefix(typed_before_cursor))
+        .unwrap_or_default()
+        .to_string();
+
+    (top_suggestion, ghost_suffix)
+}
+
+fn input_prefix_for_cursor(input: &str, cursor_codepoints: usize) -> &str {
+    let cursor_byte = input
+        .char_indices()
+        .nth(cursor_codepoints)
+        .map(|(idx, _)| idx)
+        .unwrap_or(input.len());
+    &input[..cursor_byte]
 }

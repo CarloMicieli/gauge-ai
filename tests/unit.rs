@@ -1,3 +1,5 @@
+#[path = "unit/command_autocomplete_tests.rs"]
+mod command_autocomplete_tests;
 #[path = "unit/health_state_tests.rs"]
 mod health_state_tests;
 #[path = "unit/knowledge_base_tests.rs"]

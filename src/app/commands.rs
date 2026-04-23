@@ -37,6 +37,20 @@ pub enum CommandError {
     MissingArgs(&'static str),
 }
 
+/// Supported slash commands for command-line autocomplete in the TUI.
+pub const AVAILABLE_COMMANDS: [&str; 10] = [
+    "/help",
+    "/list-scraper",
+    "/scrape",
+    "/latest",
+    "/query",
+    "/export",
+    "/setup",
+    "/clear",
+    "/quit",
+    "/exit",
+];
+
 /// Convert command parser failures into user-readable messages with recovery hints.
 pub fn command_error_message(error: &CommandError) -> String {
     match error {
@@ -122,6 +136,18 @@ pub fn parse(input: &str) -> Result<Command, CommandError> {
         "/quit" | "/exit" => Ok(Command::Quit),
         _ => Err(CommandError::Unknown),
     }
+}
+
+/// Return the first command that starts with the current input text.
+pub fn top_command_suggestion(input: &str) -> Option<&'static str> {
+    if input.is_empty() {
+        return None;
+    }
+
+    AVAILABLE_COMMANDS
+        .iter()
+        .copied()
+        .find(|command| command.starts_with(input))
 }
 
 /// Execute a parsed command for the currently supported bootstrap flows.
