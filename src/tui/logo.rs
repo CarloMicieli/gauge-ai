@@ -1,19 +1,49 @@
-/// Steam-locomotive art for wider terminal headers.
+use ratatui::style::Style;
+use ratatui::text::{Line, Span};
+
+/// Steam-locomotive ASCII art for wider terminal headers.
 pub fn full_logo_lines(tick: usize) -> Vec<String> {
-    let wheels = if tick.is_multiple_of(2) {
-        "(o)====(o)"
+    let wheel_left = if tick.is_multiple_of(2) {
+        "▀▀  ▀▀"
     } else {
-        "(O)====(O)"
+        " ▀▀  ▀▀"
+    };
+    let wheel_right = if tick.is_multiple_of(2) {
+        "▀▀        ▀▀"
+    } else {
+        " ▀▀      ▀▀"
     };
 
     vec![
-        "        ~~      ~~~".to_string(),
-        "       (__)    (___)".to_string(),
-        "   _____||______".to_string(),
-        " _| RED STEAM  |___  ____".to_string(),
-        "|_|[] [] [] []|___ ||____\\____".to_string(),
-        "  O==========O      ||  __    \\\\>>>".to_string(),
-        format!("     {wheels}      ||_|  |____/"),
+        "       ██████   ".to_string(),
+        "      ████████  _________________________".to_string(),
+        "      ██    ██ |                         |".to_string(),
+        "    ██████████ |        GAUGE.AI         |".to_string(),
+        "    ██████████ |_________________________|".to_string(),
+        "    █████████████   ██            ██".to_string(),
+        "     ███████████    ██            ██".to_string(),
+        "      █████████      ████      ████".to_string(),
+        format!("       {wheel_left}         {wheel_right}"),
+    ]
+}
+
+/// Styled pixel sprite logo used in the left header panel.
+pub fn pixel_sprite_lines(red: Style, white: Style) -> Vec<Line<'static>> {
+    vec![
+        Line::from(Span::styled("   ███████", red)),
+        Line::from(Span::styled(" ███████████", red)),
+        Line::from(vec![
+            Span::styled(" █  ", red),
+            Span::styled("●   ●", white),
+            Span::styled("  █", red),
+        ]),
+        Line::from(Span::styled("█████████████", red)),
+        Line::from(vec![
+            Span::styled(" █  ", red),
+            Span::styled("▄▄▄▄▄", red),
+            Span::styled("  █", red),
+        ]),
+        Line::from(Span::styled("  ██     ██", red)),
     ]
 }
 

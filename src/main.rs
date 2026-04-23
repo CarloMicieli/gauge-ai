@@ -15,6 +15,7 @@ use gauge_ai::app::error::AppResult;
 use gauge_ai::app::logging::init_logging;
 use gauge_ai::app::perf::log_startup_timing;
 use gauge_ai::app::state::RuntimeState;
+use gauge_ai::tui::logo::pixel_sprite_lines;
 use gauge_ai::tui::widgets::{render_command_failure, render_help, render_split_header};
 use ratatui::Terminal;
 use ratatui::backend::CrosstermBackend;
@@ -97,11 +98,8 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
     let locomotive_red = Style::default()
         .fg(Color::Rgb(220, 40, 40))
         .bg(Color::Rgb(0, 0, 0));
-    let highlight_orange = Style::default()
-        .fg(Color::Rgb(255, 166, 77))
-        .bg(Color::Rgb(0, 0, 0));
-    let highlight_yellow = Style::default()
-        .fg(Color::Rgb(255, 214, 10))
+    let sprite_white = Style::default()
+        .fg(Color::Rgb(255, 245, 245))
         .bg(Color::Rgb(0, 0, 0));
     let checking_icon_style = Style::default()
         .fg(Color::Rgb(172, 132, 255))
@@ -115,9 +113,13 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
             let area = frame.area();
             frame.render_widget(Block::default().style(background_style), area);
             let header_sections = render_split_header(&runtime, &runtime.health, 0, 0, area.width);
-            let right_content_height = header_sections.right_banner.len().saturating_add(3);
-            let top_content_height =
-                header_sections.left_ascii.len().max(right_content_height) as u16;
+            let right_content_height = 3;
+            let left_content_height = if area.width >= 72 {
+                pixel_sprite_lines(locomotive_red, sprite_white).len()
+            } else {
+                header_sections.left_ascii.len()
+            };
+            let top_content_height = left_content_height.max(right_content_height) as u16;
             let header_height = top_content_height.saturating_add(2);
 
             let chunks = Layout::default()
@@ -143,22 +145,34 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
                 .constraints([Constraint::Percentage(60), Constraint::Percentage(40)])
                 .split(top_inner_area);
 
-            let left_lines: Vec<Line<'static>> = header_sections
-                .left_ascii
-                .iter()
-                .enumerate()
-                .map(|(index, line)| {
-                    if index == 0 {
-                        Line::styled(line.clone(), highlight_yellow)
-                    } else if index == 1 || index == 2 {
-                        Line::styled(line.clone(), highlight_orange)
-                    } else {
-                        Line::styled(line.clone(), locomotive_red)
-                    }
-                })
-                .collect();
-            let left_ascii = Paragraph::new(Text::from(left_lines)).alignment(Alignment::Left);
-            frame.render_widget(left_ascii, top_columns[0]);
+            if area.width >= 72 {
+                let left_inner = Layout::default()
+                    .direction(Direction::Horizontal)
+                    .constraints([
+                        Constraint::Length(14),
+                        Constraint::Length(2),
+                        Constraint::Min(0),
+                    ])
+                    .split(top_columns[0]);
+
+                let logo =
+                    Paragraph::new(Text::from(pixel_sprite_lines(locomotive_red, sprite_white)))
+                        .alignment(Alignment::Left);
+                frame.render_widget(logo, left_inner[0]);
+
+                let gaugeai = Paragraph::new(header_sections.right_banner.join("\n"))
+                    .style(primary_style.add_modifier(Modifier::BOLD))
+                    .alignment(Alignment::Left);
+                frame.render_widget(gaugeai, left_inner[2]);
+            } else {
+                let left_lines: Vec<Line<'static>> = header_sections
+                    .left_ascii
+                    .iter()
+                    .map(|line| Line::styled(line.clone(), locomotive_red))
+                    .collect();
+                let left_ascii = Paragraph::new(Text::from(left_lines)).alignment(Alignment::Left);
+                frame.render_widget(left_ascii, top_columns[0]);
+            }
 
             let right_block = Block::default()
                 .borders(Borders::LEFT)
@@ -169,17 +183,11 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
             let right_layout = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints([
-                    Constraint::Length(header_sections.right_banner.len() as u16),
                     Constraint::Length(1),
                     Constraint::Length(2),
                     Constraint::Min(0),
                 ])
                 .split(right_inner_area);
-
-            let banner = Paragraph::new(header_sections.right_banner.join("\n"))
-                .style(primary_style.add_modifier(Modifier::BOLD))
-                .alignment(Alignment::Center);
-            frame.render_widget(banner, right_layout[0]);
 
             let status_lines = vec![
                 Line::from(vec![
@@ -192,7 +200,7 @@ fn run_tui_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> 
                 ]),
             ];
             let status = Paragraph::new(Text::from(status_lines));
-            frame.render_widget(status, right_layout[2]);
+            frame.render_widget(status, right_layout[1]);
 
             let output = Paragraph::new(output_lines.join("\n"))
                 .style(subtext_style)
