@@ -1,4 +1,1 @@
-<!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read specs/001-gauge-ai-tui-app/plan.md
-<!-- SPECKIT END -->
+Check [AGENTS.md](./AGENTS.md) for instructions on how to use agents in this repository.
