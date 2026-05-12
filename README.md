@@ -1,5 +1,9 @@
 # Gauge.ai
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![GitHub last commit](https://img.shields.io/github/last-commit/CarloMicieli/gauge-ai)
+[![CI](https://github.com/CarloMicieli/gauge-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/CarloMicieli/gauge-ai/actions/workflows/ci.yml)
+
 **Gauge.ai** is a high-performance Terminal User Interface (TUI) built in Rust. It serves as a local knowledge aggregator for model railway enthusiasts, combining multi-source web scraping, AI-driven data reconciliation via Ollama, and local semantic search using a vector-enabled SQLite database.
 
 ---
@@ -15,7 +19,7 @@
 ## 2. Technical Stack
 | Component | Technology |
 | :--- | :--- |
-| **Language** | Rust (Edition 2021) |
+| **Language** | Rust (Edition 2024) |
 | **Async Runtime** | `tokio` |
 | **TUI Framework** | `ratatui` with `crossterm` |
 | **Database** | SQLite + `sqlite-vec` (Single-file storage) |
