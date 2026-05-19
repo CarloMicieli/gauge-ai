@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-config = { version = "0.15.22", features = ["toml"] }
+config = { version = "0.15.23", features = ["toml"] }
 crossterm = "0.29.0"
 digest = "0.11.3"
 directories = "6.0.0"
